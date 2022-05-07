@@ -1,5 +1,4 @@
 const express = require('express');
-const async = require('hbs/lib/async');
 const router = express.Router();
 
 // require the Drone model here
@@ -18,36 +17,63 @@ router.get('/', (req, res, next) => {
 router.get('/create', (req, res, next) => {
   // Iteration #3: Add a new drone
   res.render('drones/create-form');
+  
 });
 
-router.post('/create', async (req, res, next) => {
+router.post('/create', (req, res, next) => {
   // Iteration #3: Add a new drone
   try {
     const { name, propellers, maxSpeed}=req.body;
-    await Drone.create({
+     Drone.create({
       name, 
       propellers, 
       maxSpeed
     })
-    res.redirect("/drones");
+    res.redirect('/drones');
   } catch (error) {
     
   }
 });
 
-router.get('/drones/:id/edit', (req, res, next) => {
+router.get('/:id/edit', (req, res, next) => {
   // Iteration #4: Update the drone
-  // ... your code here
+  try {
+    const { id } = req.params;
+    const drone = Drone.findById(id);
+    res.render('drones/update-form', drone);
+  } catch (error) {
+    next(error);
+  }
 });
 
-router.post('/drones/:id/edit', (req, res, next) => {
+router.post('/:id/edit', (req, res, next) => {
   // Iteration #4: Update the drone
-  // ... your code here
+  try {
+    const { id } = req.params;
+    const { name, propellers, maxSpeed } = req.body;
+    Drone.findByIdAndUpdate(id,
+      { name, propellers, maxSpeed },
+      {
+        new: true
+      });
+    
+      res.redirect('/drones');
+  } catch (error) {
+    next(error);
+  }
 });
 
-router.post('/drones/:id/delete', (req, res, next) => {
+router.post('/:id/delete', (req, res, next) => {
   // Iteration #5: Delete the drone
-  // ... your code here
+  try {
+    const { id } = req.params;
+    Book.findByIdAndDelete(id);
+
+    res.redirect('/drones');
+  } catch (error) {
+    next(error);
+  }
 });
+
 
 module.exports = router;
